@@ -34,22 +34,19 @@ void addArete(Graph*, int id, int start, int end);
 void printGraph(Graph *g);
 void printVertex(Vertex *v);
 void printArete(Arete *a);
-
+void createCompleteGraph(Graph*g, int n);
 
 int main(){/*gcc -c -Wall -Wextra main.c && gcc main.o -lm -o main && ./main*/
 
-    Graph g;
-    createGraph(&g, 20, 20);
-    addVertex(&g, 0, 20, 30);
-    addVertex(&g, 1, 60, 20);
-    addVertex(&g, 2, 30, -10);
+    Graph k5;
+    createGraph(&k5, 10, 100);
 
-    addArete(&g, 0, 0, 1);
-    addArete(&g, 1, 2, 0);
+    createCompleteGraph(&k5, 5);
 
 
-    printGraph(&g);
-    destructGraph(&g);
+
+    printGraph(&k5);
+    destructGraph(&k5);
 
     return 0;
 }
@@ -117,9 +114,20 @@ void printVertex(Vertex*v){
 }
 
 void printArete(Arete *a){
-    printf("=====================  Arete\n----Identifier----\n%d \n  %d <-----------> %d\n", a->id, a->start, a->end);
+    printf("=====================  Arete\n----Identifier----\n%d \n  %d -----------> %d\n", a->id, a->start, a->end);
 }
 
+void createCompleteGraph(Graph*g, int n){
+    if(n <= 0)
+        return;
+    for(int i = 0 ; i < n ; i++)
+        addVertex(g, i, i*20, 20);//add enough vertexs
+
+    for(int i = 0 ; i < n ; i++)
+        for(int j = 0 ; j < n ; j++){
+            addArete(g, i*n+j, i, j);//connect them
+        }
+}
 
 
 
