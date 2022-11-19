@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <time.h>
 #include "SDL_Basics.h"
 
 #define NO_COLOR -1
+#define NB_COLOR 15
 
 typedef struct
 {
@@ -38,10 +40,79 @@ void printGraph(Graph *g);
 void printVertex(Vertex *v);
 void printArete(Arete *a);
 void createCompleteGraph(Graph *g, int n);
-void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp);
+void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp, SDL_Color*c);
 
 int main()
 { /*gcc -c -Wall -Wextra main.c && gcc main.o -lm -o main && ./main*/
+
+    SDL_Color * palette = malloc(NB_COLOR*sizeof(SDL_Color));
+    
+    palette[0].r = 252;//yellow
+    palette[0].g = 186;
+    palette[0].b = 1;
+
+    palette[1].r = 252;//red
+    palette[1].g = 3;
+    palette[1].b = 3;
+
+    palette[2].r = 147;//lime
+    palette[2].g = 252;
+    palette[2].b = 0;
+
+    palette[5].r = 3;//soft blue
+    palette[5].g = 215;
+    palette[5].b = 252;
+
+    palette[3].r = 252;//soft pink
+    palette[3].g = 134;
+    palette[3].b = 219;
+
+    palette[4].r = 163;//light brown
+    palette[4].g = 144;
+    palette[4].b = 3;
+
+    palette[10].r = 250;//beige
+    palette[10].g = 237;
+    palette[10].b = 137;
+
+    palette[6].r = 193;//soft green
+    palette[6].g = 255;
+    palette[6].b = 143;
+
+    palette[7].r = 86;//kaki
+    palette[7].g = 125;
+    palette[7].b = 55;
+
+    palette[8].r = 39;//hard green
+    palette[8].g = 87;
+    palette[8].b = 1;
+
+    palette[9].r = 5;//azur
+    palette[9].g = 245;
+    palette[9].b = 145;
+
+    palette[11].r = 5;//deep blue
+    palette[11].g = 25;
+    palette[11].b = 250;
+
+    palette[12].r = 90;//hard magenta
+    palette[12].g = 7;
+    palette[12].b = 245;
+
+    palette[13].r = 175;//soft magenta
+    palette[13].g = 134;
+    palette[13].b = 252;
+
+    palette[14].r = 66;//hard brown
+    palette[14].g = 58;
+    palette[14].b = 1;
+
+    for(int i = 0 ; i < NB_COLOR ; i++)
+        palette[i].a = 1;
+
+
+
+    srand(time(0));
 
     SDL_Window *w;
     SDL_Renderer *r;
@@ -56,15 +127,13 @@ int main()
     Graph g;
     createGraph(&g, 100, 10000);
 
-    int i = 0;
 
-    while (program_launched && i <= 50)
+    while (program_launched)
     {
-        createCompleteGraph(&g, i);
+        createCompleteGraph(&g, 8);
         background(r, 255, 255, 255, WIDTH, HEIGHT);
 
-        displayGraph(r, f, &g, tmp);
-        i++;
+        displayGraph(r, f, &g, tmp, palette);
         SDL_Delay(500);
         SDL_RenderPresent(r); // refresh the render
 
@@ -93,6 +162,7 @@ int main()
             }
         }
     }
+    free(palette);
     free(tmp);
     TTF_CloseFont(f);
     destructGraph(&g);
@@ -132,7 +202,7 @@ void addVertex(Graph *g, int id, int x, int y)
     v.x = x;
     v.y = y;
     v.card = 0;
-    v.color = NO_COLOR;
+    v.color = rand() % NB_COLOR;
     (g->vertexs)[g->nb_vertex] = v;
     (g->nb_vertex)++;
 }
@@ -181,9 +251,10 @@ void createCompleteGraph(Graph *g, int n)
     if (n <= 0)
         return;
     for (int i = 0; i < n; i++){
-        g->vertexs[i].x = cos(i * 2 * 3.1415 / (float)n) * (fmin(WIDTH, HEIGHT)/2) + WIDTH / 2;
-        g->vertexs[i].y = sin(i * 2 * 3.1415 / (float)n) * (fmin(WIDTH, HEIGHT)/2) + HEIGHT / 2;
+        g->vertexs[i].x = cos(i * 2 * 3.1415 / (float)n) * (fmin(WIDTH, HEIGHT)/2.1) + WIDTH / 2;
+        g->vertexs[i].y = sin(i * 2 * 3.1415 / (float)n) * (fmin(WIDTH, HEIGHT)/2.1) + HEIGHT / 2;
         g->vertexs[i].id = i;// add vertexs and create a circle with their coordinates
+        g->vertexs[i].color = i % NB_COLOR;
         g->nb_vertex = i+1;
     }
 
@@ -198,7 +269,7 @@ void createCompleteGraph(Graph *g, int n)
         }
 }
 
-void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp)
+void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp, SDL_Color*c)
 {
     int size = 20;
 
@@ -206,7 +277,11 @@ void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp)
     for (int i = 0; i < g->nb_vertex; i++)
     {
         // color gestion to come
-        color(r, 0, 0, 0, 0);
+        if(g->vertexs[i].color != NO_COLOR){
+            color(r, c[g->vertexs[i].color].r, c[g->vertexs[i].color].g, c[g->vertexs[i].color].b, c[g->vertexs[i].color].a);
+            circle(r, g->vertexs[i].x, g->vertexs[i].y, size, 1);
+        }
+        color(r, 0, 0, 0, 1);//black border
         circle(r, g->vertexs[i].x, g->vertexs[i].y, size, 0);
         toChar(tmp, g->vertexs[i].id);
         // printf("%d\n", g->vertexs[i].id);
@@ -215,7 +290,6 @@ void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp)
 
     // display aretes
     double sx, sy, ex, ey;
-    double start_angle, end_angle;
     for (int i = 0; i < g->nb_arete; i++)
     {
         sx = g->vertexs[g->aretes[i].start].x;
