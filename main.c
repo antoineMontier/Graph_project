@@ -43,6 +43,8 @@ void printVertex(Vertex *v);
 void printArete(Arete *a);
 void createCompleteGraph(Graph *g, int n);
 void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp, SDL_Color *c);
+void circlePoints(Graph*g);
+
 
 int main()
 { /*gcc -c -Wall -Wextra main.c && gcc main.o -lm -o main && ./main*/
@@ -137,6 +139,7 @@ int main()
     addArete(&g, 2, 3, 2, 0);
     addArete(&g, 4, 2, 0, 3);
     addArete(&g, 5, 3, 3, 5);
+    circlePoints(&g);
 
     while (program_launched)
     {
@@ -177,6 +180,7 @@ int main()
     TTF_CloseFont(f);
     destructGraph(&g);
     closeSDL(&w, &r);
+    printf("Closed sucessfully !\n");
     return 0;
 }
 
@@ -338,5 +342,13 @@ void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp, SDL_Color *
                         sx+size*0.9, sy + size*1.1,//right
                         sx+size*0.5, sy + size*1.3,1);//left
         }
+    }
+}
+
+void circlePoints(Graph*g){
+    
+    for(int i = 0 ; i < g->nb_vertex ; i++){
+        g->vertexs[i].x = cos(i * 2 * 3.1415 /g->nb_vertex) * (fmin(WIDTH, HEIGHT) / 2.1) + WIDTH / 2;
+        g->vertexs[i].y = sin(i * 2 * 3.1415 /g->nb_vertex) * (fmin(WIDTH, HEIGHT) / 2.1) + HEIGHT / 2;
     }
 }
