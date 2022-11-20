@@ -1,4 +1,5 @@
 #include "graph.h"
+#include <string.h>
 
 
 
@@ -169,4 +170,109 @@ void circlePoints(Graph*g){
         g->vertexs[i].x = cos(i * 2 * 3.1415 /g->nb_vertex) * (fmin(WIDTH, HEIGHT) / 2.1) + WIDTH / 2;
         g->vertexs[i].y = sin(i * 2 * 3.1415 /g->nb_vertex) * (fmin(WIDTH, HEIGHT) / 2.1) + HEIGHT / 2;
     }
+}
+
+SDL_Color* initialiseColors(){
+    SDL_Color *palette = malloc(NB_COLOR * sizeof(SDL_Color));
+
+    palette[0].r = 252; // yellow
+    palette[0].g = 186;
+    palette[0].b = 1;
+
+    palette[1].r = 252; // red
+    palette[1].g = 3;
+    palette[1].b = 3;
+
+    palette[2].r = 147; // lime
+    palette[2].g = 252;
+    palette[2].b = 0;
+
+    palette[5].r = 3; // soft blue
+    palette[5].g = 215;
+    palette[5].b = 252;
+
+    palette[3].r = 252; // soft pink
+    palette[3].g = 134;
+    palette[3].b = 219;
+
+    palette[4].r = 163; // light brown
+    palette[4].g = 144;
+    palette[4].b = 3;
+
+    palette[10].r = 250; // beige
+    palette[10].g = 237;
+    palette[10].b = 137;
+
+    palette[6].r = 193; // soft green
+    palette[6].g = 255;
+    palette[6].b = 143;
+
+    palette[7].r = 86; // kaki
+    palette[7].g = 125;
+    palette[7].b = 55;
+
+    palette[8].r = 39; // hard green
+    palette[8].g = 87;
+    palette[8].b = 1;
+
+    palette[9].r = 5; // azur
+    palette[9].g = 245;
+    palette[9].b = 145;
+
+    palette[11].r = 5; // deep blue
+    palette[11].g = 25;
+    palette[11].b = 250;
+
+    palette[12].r = 90; // hard magenta
+    palette[12].g = 7;
+    palette[12].b = 245;
+
+    palette[13].r = 175; // soft magenta
+    palette[13].g = 134;
+    palette[13].b = 252;
+
+    palette[14].r = 66; // hard brown
+    palette[14].g = 58;
+    palette[14].b = 1;
+
+    for (int i = 0; i < NB_COLOR; i++)
+        palette[i].a = 1;
+
+    return palette;
+}
+
+void weightAsDistance(Graph*g){
+    for(int i = 0 ; i < g->nb_arete ; i++){
+        g->aretes[i].weight = dist(g->vertexs[g->aretes[i].start].x, g->vertexs[g->aretes[i].start].y,g->vertexs[g->aretes[i].end].x, g->vertexs[g->aretes[i].end].y);
+    }
+}
+
+void creatCoordinatesSystem(FILE*f, Graph*g){
+    if(f == NULL)
+        return;
+
+    //first know the min/max value
+    double xmin, xmax, ymin, ymax;
+    char buffer[128];
+    char bin[16];
+
+    fgets(buffer, sizeof(buffer), f);
+    sscanf(buffer, "%3s", bin);
+    if(strcmp(bin, "MIN") != 0)
+        fprintf(stderr, "no min value in the coordinate file\n");
+    sscanf(buffer, "%4s%lf%3s%lf",bin, &xmin, bin, &ymin);
+
+    fgets(buffer, sizeof(buffer), f);
+    sscanf(buffer, "%3s", bin);
+    if(strcmp(bin, "MAX") != 0)
+        fprintf(stderr, "no max value in the coordinate file\n");
+    sscanf(buffer, "%4s%lf%3s%lf", bin, &xmax, bin, &ymax);
+
+    //here, xmin ymin xmax ymax are initialized !
+    printf("%lf ; %lf\n", xmin, ymin);
+    printf("%lf ; %lf\n", xmax, ymax);
+
+    
+
+
 }

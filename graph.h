@@ -40,3 +40,6 @@ void printArete(Arete *a);
 void createCompleteGraph(Graph *g, int n);
 void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp, SDL_Color *c);
 void circlePoints(Graph*g);
+SDL_Color* initialiseColors();
+void weightAsDistance(Graph*g);
+void creatCoordinatesSystem(FILE*f, Graph*g);
