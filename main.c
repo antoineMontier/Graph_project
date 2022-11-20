@@ -136,12 +136,10 @@ int main()
     addArete(&g, 1, 1, 0, 15);
     addArete(&g, 2, 3, 2, 0);
     addArete(&g, 4, 2, 0, 3);
+    addArete(&g, 5, 3, 3, 5);
+
     while (program_launched)
     {
-
-
-
-
 
         background(r, 255, 255, 255, WIDTH, HEIGHT);
 
@@ -214,7 +212,7 @@ void addVertex(Graph *g, int id, int x, int y, int color)
     v.x = x;
     v.y = y;
     v.card = 0;
-    if(color == -2)
+    if (color == -2)
         v.color = rand() % NB_COLOR;
     else
         v.color = color;
@@ -272,7 +270,7 @@ void createCompleteGraph(Graph *g, int n)
         g->vertexs[i].y = sin(i * 2 * 3.1415 / (float)n) * (fmin(WIDTH, HEIGHT) / 2.1) + HEIGHT / 2;
         g->vertexs[i].id = i; // add vertexs and create a circle with their coordinates
         g->vertexs[i].color = i % NB_COLOR;
-        g->vertexs[i].card = n;//is the card increased if a connexion exists or if an arrow is on the vertex ???
+        g->vertexs[i].card = n; // is the card increased if a connexion exists or if an arrow is on the vertex ???
         g->nb_vertex = i + 1;
     }
 
@@ -311,22 +309,34 @@ void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp, SDL_Color *
     double sx, sy, ex, ey;
     for (int i = 0; i < g->nb_arete; i++)
     {
-        sx = g->vertexs[g->aretes[i].start].x;
-        sy = g->vertexs[g->aretes[i].start].y;
-        ex = g->vertexs[g->aretes[i].end].x;
-        ey = g->vertexs[g->aretes[i].end].y;
-        color(r, 0, 0, 0, 0);
+        
+            sx = g->vertexs[g->aretes[i].start].x;
+            sy = g->vertexs[g->aretes[i].start].y;
+            ex = g->vertexs[g->aretes[i].end].x;
+            ey = g->vertexs[g->aretes[i].end].y;
+            color(r, 0, 0, 0, 0);
 
-        if (ex != sx || ey != sy)
-        {
             double theta = atan2(ey - sy, ex - sx);
             double theta2 = atan2(sy - ey, sx - ex);
-
+        if (g->aretes[i].start != g->aretes[i].end)//exception 
+        {
             line(r, sx + size * cos(theta), sy + size * sin(theta), ex + size * cos(theta2), ey + size * sin(theta2));
             // arrow end
             triangle(r, ex + (size * 2) * cos(theta2) + size * 0.2 * cos(theta2 + 3.1415 / 2), ey + (size * 2) * sin(theta2) + size * 0.2 * sin(theta2 + 3.1415 / 2),
                      ex + (size * 2) * cos(theta2) + size * 0.2 * cos(theta2 - 3.1415 / 2), ey + (size * 2) * sin(theta2) + size * 0.2 * sin(theta2 - 3.1415 / 2),
                      ex + size * cos(theta2), ey + size * sin(theta2), 1); // end of arrow
+        }else{//reflexive arete exception
+            //let's make an artificial circle :
+            double precision = 0.5;
+            for(int a = sx - size ; a < sx + size*2 ; a++){
+                for(int b = sy ; b < sy + size*2 ; b++){
+                    if(dist(sx, sy, a, b) > size && fabs(dist(sx, sy + size*1.2, a, b)-size*0.7) < precision)
+                        point(r, a, b);
+                }
+            }
+            triangle(r, sx+size*0.6, sy + size*0.8,//end of arrow
+                        sx+size*0.9, sy + size*1.1,//right
+                        sx+size*0.5, sy + size*1.3,1);//left
         }
     }
 }
