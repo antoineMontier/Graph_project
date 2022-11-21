@@ -106,7 +106,7 @@ void createCompleteGraph(Graph *g, int n)
         }
 }
 
-void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp, SDL_Color *c)
+void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp, SDL_Color *c, int edge_x, int edge_y, int width, int height)
 {
 
     // display vertexs
@@ -116,13 +116,13 @@ void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp, SDL_Color *
         if (g->vertexs[i].color != NO_COLOR)
         {
             color(r, c[g->vertexs[i].color].r, c[g->vertexs[i].color].g, c[g->vertexs[i].color].b, c[g->vertexs[i].color].a);
-            circle(r, g->vertexs[i].x, g->vertexs[i].y, VERTEX_SIZE, 1);
+            circle(r, (g->vertexs[i].x + edge_x)*width/WIDTH, (g->vertexs[i].y + edge_y)*height/HEIGHT, VERTEX_SIZE, 1);
         }
         color(r, 0, 0, 0, 1); // black border
-        circle(r, g->vertexs[i].x, g->vertexs[i].y, VERTEX_SIZE, 0);
+        circle(r, (g->vertexs[i].x + edge_x)*width/WIDTH, (g->vertexs[i].y + edge_y)*height/HEIGHT, VERTEX_SIZE, 0);
         toChar(tmp, g->vertexs[i].id + 3);
         // printf("%d\n", g->vertexs[i].id);
-        text(r, g->vertexs[i].x - VERTEX_SIZE * 0.8, g->vertexs[i].y - VERTEX_SIZE * 0.8, tmp, f, 0, 0, 0);
+        text(r, (g->vertexs[i].x + edge_x)*width/WIDTH - VERTEX_SIZE * 0.8, (g->vertexs[i].y + edge_y)*height/HEIGHT - VERTEX_SIZE * 0.8, tmp, f, 0, 0, 0);
     }
 
     // display aretes
@@ -130,10 +130,10 @@ void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp, SDL_Color *
     for (int i = 0; i < g->nb_arete; i++)
     {
 
-        sx = g->vertexs[g->aretes[i].start].x;
-        sy = g->vertexs[g->aretes[i].start].y;
-        ex = g->vertexs[g->aretes[i].end].x;
-        ey = g->vertexs[g->aretes[i].end].y;
+        sx = (g->vertexs[g->aretes[i].start].x + edge_x)*width/WIDTH;
+        sy = (g->vertexs[g->aretes[i].start].y + edge_y)*height/HEIGHT;
+        ex = (g->vertexs[g->aretes[i].end].x + edge_x)*width/WIDTH;
+        ey = (g->vertexs[g->aretes[i].end].y + edge_y)*height/HEIGHT;
         color(r, 0, 0, 0, 0);
 
         double theta = atan2(ey - sy, ex - sx);
@@ -253,7 +253,7 @@ void weightAsDistance(Graph *g)
     }
 }
 
-void creatCoordinatesSystem(const char*file_name, Graph *g,  int width, int height)
+void creatCoordinatesSystem(const char*file_name, Graph *g)
 {   
     FILE*f = fopen(file_name, "r");
     if(f == NULL){
@@ -305,8 +305,8 @@ void creatCoordinatesSystem(const char*file_name, Graph *g,  int width, int heig
             {
                 sscanf(buffer, "%lf%3s%lf", &x, bin, &y);
                 // printf("(%f ; %f)\n", (x-xmin)*width/(xmax-xmin), (y-ymin)*height/(ymax-ymin));
-                g->vertexs[i].y = HEIGHT - (x - xmin) * height / (xmax - xmin);
-                g->vertexs[i].x = (y - ymin) * width / (ymax - ymin);
+                g->vertexs[i].y = (HEIGHT) - (x - xmin) * HEIGHT / (xmax - xmin);
+                g->vertexs[i].x =  (y - ymin) * WIDTH / (ymax - ymin);
                 g->vertexs[i].id = i;
                 g->vertexs[i].color = NO_COLOR;
                 g->nb_vertex = i + 1;

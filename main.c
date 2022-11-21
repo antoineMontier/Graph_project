@@ -8,14 +8,10 @@
 #define OUT -1
 #define NO_ZOOM 0
 
-
-
 int main()
 { /*gcc -c -Wall -Wextra main.c && gcc main.o -lm -o main && ./main*/
 
-    
-
-    SDL_Color*palette = initialiseColors();
+    SDL_Color *palette = initialiseColors();
 
     srand(time(0));
     int zoom = NO_ZOOM;
@@ -26,7 +22,7 @@ int main()
     SDL_bool program_launched = SDL_TRUE;
     openSDL(WIDTH, HEIGHT, 0, &w, &r);
     TTF_Font *f;
-    setFont(&f, "Roboto-Black.ttf", VERTEX_SIZE*1.5);
+    setFont(&f, "Roboto-Black.ttf", VERTEX_SIZE * 1.5);
 
     char *tmp = malloc(10);
     Graph g;
@@ -62,62 +58,95 @@ int main()
     addArete(&g, id++, 8, 3, NO_WEIGHT);
     addArete(&g, id++, 0, 1, NO_WEIGHT);*/
 
-
-    int _w = WIDTH, _h = HEIGHT;
-
-
-
-
-
+    int _w = WIDTH, _h = HEIGHT, m_x = WIDTH/2, m_y = HEIGHT/2, click = 0, p_mx=0, p_my=0, c_x = 0, c_y = 0;
     while (program_launched)
-    {
-        if(zoom == IN){
-            _w *= 1.01;
-            _h *= 1.01;
+    {            
+        //printf("%d    %d  \n", _w, _h);
+        printf("%d ; %d \n", m_x, m_y);
+        if (zoom == IN)
+        {
+            _w *= 1.05;
+            _h *= 1.05;
             zoom = NO_ZOOM;
-        }else if(zoom == OUT){
-            _w *= 0.99;
-            _h *= 0.99;
-            zoom = NO_ZOOM;        }
-        creatCoordinatesSystem("./coordinates.txt", &g, _w, _h);
+        }
+        else if (zoom == OUT)
+        {
+            _w *= 0.95;
+            _h *= 0.95;
+            zoom = NO_ZOOM;
+        }
+        //printf("(%d ; %d )\n", m_x, m_y);
+        creatCoordinatesSystem("./coordinates.txt", &g);
         background(r, 255, 255, 255, WIDTH, HEIGHT);
-        displayGraph(r, f, &g, tmp, palette);
-        SDL_RenderPresent(r); // refresh the render
+        if (click)
+        {
+            displayGraph(r, f, &g, tmp, palette, c_x, c_y, _w, _h);
+            c_x += (- p_mx + m_x)*(WIDTH/(float)_w*7);
+            c_y += (- p_my + m_y)*(HEIGHT/(float)_h*6);
+            p_my = m_y;
+            p_mx = m_x;
+        }
 
-        while (SDL_PollEvent(&evt))
-        { // reads all the events (mouse moving, key pressed...)        //possible to wait for an event with SDL_WaitEvent
-            switch (evt.type)
-            {
+        else displayGraph(r, f, &g, tmp, palette, c_x, c_y, _w, _h);
+            SDL_RenderPresent(r); // refresh the render
 
-            case SDL_QUIT:
-                program_launched = SDL_FALSE; // quit the program if the user closes the window
-                break;
+            while (SDL_PollEvent(&evt))
+            { // reads all the events (mouse moving, key pressed...)        //possible to wait for an event with SDL_WaitEvent
+                switch (evt.type)
+                {
 
-            case SDL_KEYDOWN: // SDL_KEYDOWN : hold a key            SDL_KEYUP : release a key
-                switch (evt.key.keysym.sym)
-                { // returns the key ('0' ; 'e' ; 'SPACE'...)
+                case SDL_QUIT:
+                    program_launched = SDL_FALSE; // quit the program if the user closes the window
+                    break;
 
-                case SDLK_ESCAPE:
-                    program_launched = SDL_FALSE; // escape the program by pressing esc
+                case SDL_KEYDOWN: // SDL_KEYDOWN : hold a key            SDL_KEYUP : release a key
+                    switch (evt.key.keysym.sym)
+                    { // returns the key ('0' ; 'e' ; 'SPACE'...)
+
+
+                    case SDLK_ESCAPE:
+                        program_launched = SDL_FALSE; // escape the program by pressing esc
+                        break;
+
+                    default:
+                        break;
+                    }
+                case SDL_MOUSEWHEEL:
+                    zoom = evt.wheel.y;
+                    break;
+
+                case SDL_MOUSEMOTION:
+                    if(click){
+                        p_mx = m_x;
+                        p_my = m_y;
+                    }
+                    m_x = evt.button.x;
+                    m_y = evt.button.y;
+                    break;
+
+                case SDL_MOUSEBUTTONDOWN:
+                    p_mx = evt.button.x;
+                    p_my = evt.button.y;
+                    m_x = evt.button.x;
+                    m_y = evt.button.y;
+                    click = 1;
+                    break;
+
+                case SDL_MOUSEBUTTONUP:
+                    click = 0;
                     break;
 
                 default:
                     break;
                 }
-            case SDL_MOUSEWHEEL:
-                zoom = evt.wheel.y;
-                break;
-            default:
-                break;
             }
+            SDL_Delay(33);
         }
-        SDL_Delay(100);
+        free(palette);
+        free(tmp);
+        TTF_CloseFont(f);
+        destructGraph(&g);
+        closeSDL(&w, &r);
+        printf("Closed sucessfully !\n");
+        return 0;
     }
-    free(palette);
-    free(tmp);
-    TTF_CloseFont(f);
-    destructGraph(&g);
-    closeSDL(&w, &r);
-    printf("Closed sucessfully !\n");
-    return 0;
-}
