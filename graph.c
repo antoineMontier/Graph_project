@@ -1,8 +1,6 @@
 #include "graph.h"
 #include <string.h>
 
-
-
 void createGraph(Graph *g, int v, int a)
 {
     g->v = v;
@@ -110,7 +108,6 @@ void createCompleteGraph(Graph *g, int n)
 
 void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp, SDL_Color *c)
 {
-    int size = 20;
 
     // display vertexs
     for (int i = 0; i < g->nb_vertex; i++)
@@ -119,60 +116,67 @@ void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp, SDL_Color *
         if (g->vertexs[i].color != NO_COLOR)
         {
             color(r, c[g->vertexs[i].color].r, c[g->vertexs[i].color].g, c[g->vertexs[i].color].b, c[g->vertexs[i].color].a);
-            circle(r, g->vertexs[i].x, g->vertexs[i].y, size, 1);
+            circle(r, g->vertexs[i].x, g->vertexs[i].y, VERTEX_SIZE, 1);
         }
         color(r, 0, 0, 0, 1); // black border
-        circle(r, g->vertexs[i].x, g->vertexs[i].y, size, 0);
-        toChar(tmp, g->vertexs[i].id);
+        circle(r, g->vertexs[i].x, g->vertexs[i].y, VERTEX_SIZE, 0);
+        toChar(tmp, g->vertexs[i].id + 3);
         // printf("%d\n", g->vertexs[i].id);
-        text(r, g->vertexs[i].x - size / 2, g->vertexs[i].y - size / 2, tmp, f, 0, 0, 0);
+        text(r, g->vertexs[i].x - VERTEX_SIZE * 0.8, g->vertexs[i].y - VERTEX_SIZE * 0.8, tmp, f, 0, 0, 0);
     }
 
     // display aretes
     double sx, sy, ex, ey;
     for (int i = 0; i < g->nb_arete; i++)
     {
-        
-            sx = g->vertexs[g->aretes[i].start].x;
-            sy = g->vertexs[g->aretes[i].start].y;
-            ex = g->vertexs[g->aretes[i].end].x;
-            ey = g->vertexs[g->aretes[i].end].y;
-            color(r, 0, 0, 0, 0);
 
-            double theta = atan2(ey - sy, ex - sx);
-            double theta2 = atan2(sy - ey, sx - ex);
-        if (g->aretes[i].start != g->aretes[i].end)//exception 
+        sx = g->vertexs[g->aretes[i].start].x;
+        sy = g->vertexs[g->aretes[i].start].y;
+        ex = g->vertexs[g->aretes[i].end].x;
+        ey = g->vertexs[g->aretes[i].end].y;
+        color(r, 0, 0, 0, 0);
+
+        double theta = atan2(ey - sy, ex - sx);
+        double theta2 = atan2(sy - ey, sx - ex);
+        if (g->aretes[i].start != g->aretes[i].end) // exception
         {
-            line(r, sx + size * cos(theta), sy + size * sin(theta), ex + size * cos(theta2), ey + size * sin(theta2));
+            line(r, sx + VERTEX_SIZE * cos(theta), sy + VERTEX_SIZE * sin(theta), ex + VERTEX_SIZE * cos(theta2), ey + VERTEX_SIZE * sin(theta2));
             // arrow end
-            triangle(r, ex + (size * 2) * cos(theta2) + size * 0.2 * cos(theta2 + 3.1415 / 2), ey + (size * 2) * sin(theta2) + size * 0.2 * sin(theta2 + 3.1415 / 2),
-                     ex + (size * 2) * cos(theta2) + size * 0.2 * cos(theta2 - 3.1415 / 2), ey + (size * 2) * sin(theta2) + size * 0.2 * sin(theta2 - 3.1415 / 2),
-                     ex + size * cos(theta2), ey + size * sin(theta2), 1); // end of arrow
-        }else{//reflexive arete exception
-            //let's make an artificial circle :
+            triangle(r, ex + (VERTEX_SIZE * 2) * cos(theta2) + VERTEX_SIZE * 0.2 * cos(theta2 + 3.1415 / 2), ey + (VERTEX_SIZE * 2) * sin(theta2) + VERTEX_SIZE * 0.2 * sin(theta2 + 3.1415 / 2),
+                     ex + (VERTEX_SIZE * 2) * cos(theta2) + VERTEX_SIZE * 0.2 * cos(theta2 - 3.1415 / 2), ey + (VERTEX_SIZE * 2) * sin(theta2) + VERTEX_SIZE * 0.2 * sin(theta2 - 3.1415 / 2),
+                     ex + VERTEX_SIZE * cos(theta2), ey + VERTEX_SIZE * sin(theta2), 1); // end of arrow
+        }
+        else
+        { // reflexive arete exception
+            // let's make an artificial circle :
             double precision = 0.5;
-            for(int a = sx - size ; a < sx + size*2 ; a++){
-                for(int b = sy ; b < sy + size*2 ; b++){
-                    if(dist(sx, sy, a, b) > size && fabs(dist(sx, sy + size*1.2, a, b)-size*0.7) < precision)
+            for (int a = sx - VERTEX_SIZE; a < sx + VERTEX_SIZE * 2; a++)
+            {
+                for (int b = sy; b < sy + VERTEX_SIZE * 2; b++)
+                {
+                    if (dist(sx, sy, a, b) > VERTEX_SIZE && fabs(dist(sx, sy + VERTEX_SIZE * 1.2, a, b) - VERTEX_SIZE * 0.7) < precision)
                         point(r, a, b);
                 }
             }
-            triangle(r, sx+size*0.6, sy + size*0.8,//end of arrow
-                        sx+size*0.9, sy + size*1.1,//right
-                        sx+size*0.5, sy + size*1.3,1);//left
+            triangle(r, sx + VERTEX_SIZE * 0.6, sy + VERTEX_SIZE * 0.8,  // end of arrow
+                     sx + VERTEX_SIZE * 0.9, sy + VERTEX_SIZE * 1.1,     // right
+                     sx + VERTEX_SIZE * 0.5, sy + VERTEX_SIZE * 1.3, 1); // left
         }
     }
 }
 
-void circlePoints(Graph*g){
-    
-    for(int i = 0 ; i < g->nb_vertex ; i++){
-        g->vertexs[i].x = cos(i * 2 * 3.1415 /g->nb_vertex) * (fmin(WIDTH, HEIGHT) / 2.1) + WIDTH / 2;
-        g->vertexs[i].y = sin(i * 2 * 3.1415 /g->nb_vertex) * (fmin(WIDTH, HEIGHT) / 2.1) + HEIGHT / 2;
+void circlePoints(Graph *g)
+{
+
+    for (int i = 0; i < g->nb_vertex; i++)
+    {
+        g->vertexs[i].x = cos(i * 2 * 3.1415 / g->nb_vertex) * (fmin(WIDTH, HEIGHT) / 2.1) + WIDTH / 2;
+        g->vertexs[i].y = sin(i * 2 * 3.1415 / g->nb_vertex) * (fmin(WIDTH, HEIGHT) / 2.1) + HEIGHT / 2;
     }
 }
 
-SDL_Color* initialiseColors(){
+SDL_Color *initialiseColors()
+{
     SDL_Color *palette = malloc(NB_COLOR * sizeof(SDL_Color));
 
     palette[0].r = 252; // yellow
@@ -241,38 +245,132 @@ SDL_Color* initialiseColors(){
     return palette;
 }
 
-void weightAsDistance(Graph*g){
-    for(int i = 0 ; i < g->nb_arete ; i++){
-        g->aretes[i].weight = dist(g->vertexs[g->aretes[i].start].x, g->vertexs[g->aretes[i].start].y,g->vertexs[g->aretes[i].end].x, g->vertexs[g->aretes[i].end].y);
+void weightAsDistance(Graph *g)
+{
+    for (int i = 0; i < g->nb_arete; i++)
+    {
+        g->aretes[i].weight = dist(g->vertexs[g->aretes[i].start].x, g->vertexs[g->aretes[i].start].y, g->vertexs[g->aretes[i].end].x, g->vertexs[g->aretes[i].end].y);
     }
 }
 
-void creatCoordinatesSystem(FILE*f, Graph*g){
-    if(f == NULL)
-        return;
+void creatCoordinatesSystem(const char*file_name, Graph *g,  int width, int height)
+{   
+    FILE*f = fopen(file_name, "r");
+    if(f == NULL){
+        fprintf(stderr, "failed to open text file\n");
+        fclose(f);
 
-    //first know the min/max value
+        return;
+    }
+
+    // first know the min/max value
     double xmin, xmax, ymin, ymax;
     char buffer[128];
     char bin[16];
+    double x, y;
+    int a, b;
 
     fgets(buffer, sizeof(buffer), f);
     sscanf(buffer, "%3s", bin);
-    if(strcmp(bin, "MIN") != 0)
+    if (strcmp(bin, "MIN") != 0)
         fprintf(stderr, "no min value in the coordinate file\n");
-    sscanf(buffer, "%4s%lf%3s%lf",bin, &xmin, bin, &ymin);
+    sscanf(buffer, "%4s%lf%3s%lf", bin, &xmin, bin, &ymin);
 
     fgets(buffer, sizeof(buffer), f);
     sscanf(buffer, "%3s", bin);
-    if(strcmp(bin, "MAX") != 0)
+    if (strcmp(bin, "MAX") != 0)
         fprintf(stderr, "no max value in the coordinate file\n");
     sscanf(buffer, "%4s%lf%3s%lf", bin, &xmax, bin, &ymax);
 
-    //here, xmin ymin xmax ymax are initialized !
-    printf("%lf ; %lf\n", xmin, ymin);
-    printf("%lf ; %lf\n", xmax, ymax);
+    x = fmin(xmin, xmax);
+    y = fmax(xmin, xmax);
+    xmin = x;
+    xmax = y;
+    x = fmin(ymin, ymax);
+    y = fmax(ymin, ymax);
+    ymin = x;
+    ymax = y;
+    int links_reading = 0;
 
-    
+    // here, xmin ymin xmax ymax are initialized !
+    int i = 0;
+    while (!feof(f))
+    { // read while end of file isn't reached
+        fgets(buffer, sizeof(buffer), f);
 
-
+        if (!links_reading)
+        {
+            sscanf(buffer, "%6s", bin);
+            if (strcmp(bin, "LINKS") != 0)
+            {
+                sscanf(buffer, "%lf%3s%lf", &x, bin, &y);
+                // printf("(%f ; %f)\n", (x-xmin)*width/(xmax-xmin), (y-ymin)*height/(ymax-ymin));
+                g->vertexs[i].y = HEIGHT - (x - xmin) * height / (xmax - xmin);
+                g->vertexs[i].x = (y - ymin) * width / (ymax - ymin);
+                g->vertexs[i].id = i;
+                g->vertexs[i].color = NO_COLOR;
+                g->nb_vertex = i + 1;
+                i++;
+                if (i >= g->v)
+                {
+                    fprintf(stderr, "graph vertex array is too small\n");
+                    fclose(f);
+                    return;
+                }
+            }
+            else
+            {
+                links_reading = 1;
+                i = 0;
+            }
+        }
+        else if (links_reading)
+        {
+            sscanf(buffer, "%c", &bin[0]);
+            if (bin[0] != '.') 
+            {
+                sscanf(buffer, "%d%c%d", &a, &bin[0], &b);
+                g->aretes[i].start = a - 3;
+                g->aretes[i].end = b - 3; //-3 to count after max and min
+                g->aretes[i].id = i;
+                g->aretes[i].weight = NO_WEIGHT;
+                g->nb_arete = i + 1;
+                i++;
+                if (i >= g->a)
+                {
+                    fprintf(stderr, "graph arete array is too small\n");
+                    fclose(f);
+                    return;
+                }
+            }else{//bin[0] == 'd' ; create a double arete
+                sscanf(buffer, "%c%d%c%d",&bin[0], &a, &bin[0], &b);
+                g->aretes[i].start = a - 3;
+                g->aretes[i].end = b - 3; //-3 to count after max and min
+                g->aretes[i].id = i;
+                g->aretes[i].weight = NO_WEIGHT;
+                g->nb_arete = i + 1;
+                i++;
+                if (i >= g->a)
+                {
+                    fprintf(stderr, "graph arete array is too small\n");
+                    fclose(f);
+                    return;
+                }
+                g->aretes[i].start = b - 3;
+                g->aretes[i].end = a - 3; //-3 to count after max and min
+                g->aretes[i].id = i;
+                g->aretes[i].weight = NO_WEIGHT;
+                g->nb_arete = i + 1;
+                i++;
+                if (i >= g->a)
+                {
+                    fprintf(stderr, "graph arete array is too small\n");
+                    fclose(f);
+                    return;
+                }
+            }
+        }
+    }
+    fclose(f);
+    // printf("%f\n", ymax-ymin);
 }

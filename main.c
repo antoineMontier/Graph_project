@@ -4,20 +4,21 @@
 #include <time.h>
 #include "SDL_Basics.h"
 #include "graph.h"
+#define IN 1
+#define OUT -1
+#define NO_ZOOM 0
 
 
 
 int main()
 { /*gcc -c -Wall -Wextra main.c && gcc main.o -lm -o main && ./main*/
 
-    FILE*reader = fopen("./coordinates.txt", "r");
-    if(reader == NULL)
-        fprintf(stderr, "failed to open text file\n");
+    
 
     SDL_Color*palette = initialiseColors();
 
     srand(time(0));
- 
+    int zoom = NO_ZOOM;
     SDL_Window *w;
     SDL_Renderer *r;
 
@@ -62,16 +63,23 @@ int main()
     addArete(&g, id++, 0, 1, NO_WEIGHT);*/
 
 
+    int _w = WIDTH, _h = HEIGHT;
 
 
 
 
-
-    creatCoordinatesSystem(reader, &g);
 
     while (program_launched)
     {
-
+        if(zoom == IN){
+            _w *= 1.01;
+            _h *= 1.01;
+            zoom = NO_ZOOM;
+        }else if(zoom == OUT){
+            _w *= 0.99;
+            _h *= 0.99;
+            zoom = NO_ZOOM;        }
+        creatCoordinatesSystem("./coordinates.txt", &g, _w, _h);
         background(r, 255, 255, 255, WIDTH, HEIGHT);
         displayGraph(r, f, &g, tmp, palette);
         SDL_RenderPresent(r); // refresh the render
@@ -96,13 +104,15 @@ int main()
                 default:
                     break;
                 }
+            case SDL_MOUSEWHEEL:
+                zoom = evt.wheel.y;
+                break;
             default:
                 break;
             }
         }
         SDL_Delay(100);
     }
-    fclose(reader);
     free(palette);
     free(tmp);
     TTF_CloseFont(f);
