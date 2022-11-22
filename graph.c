@@ -112,17 +112,17 @@ void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp, SDL_Color *
     // display vertexs
     for (int i = 0; i < g->nb_vertex; i++)
     {
-        // color gestion to come
+        // color gestion
         if (g->vertexs[i].color != NO_COLOR)
         {
             color(r, c[g->vertexs[i].color].r, c[g->vertexs[i].color].g, c[g->vertexs[i].color].b, c[g->vertexs[i].color].a);
-            circle(r, edge_x + (g->vertexs[i].x)*width/WIDTH, edge_y + (g->vertexs[i].y)*height/HEIGHT, VERTEX_SIZE, 1);
+            circle(r, edge_x + (g->vertexs[i].x) * width / WIDTH, edge_y + (g->vertexs[i].y) * height / HEIGHT, VERTEX_SIZE, 1);
         }
         color(r, 0, 0, 0, 1); // black border
-        circle(r, edge_x + (g->vertexs[i].x)*width/WIDTH, edge_y + (g->vertexs[i].y)*height/HEIGHT, VERTEX_SIZE, 0);
-        toChar(tmp, g->vertexs[i].id + 3);
+        circle(r, edge_x + (g->vertexs[i].x) * width / WIDTH, edge_y + (g->vertexs[i].y) * height / HEIGHT, VERTEX_SIZE, 0);
+        toChar(tmp, g->vertexs[i].id);
         // printf("%d\n", g->vertexs[i].id);
-        text(r, edge_x + (g->vertexs[i].x)*width/WIDTH - VERTEX_SIZE * 0.8, edge_y + (g->vertexs[i].y)*height/HEIGHT - VERTEX_SIZE * 0.8, tmp, f, 0, 0, 0);
+        text(r, edge_x + (g->vertexs[i].x) * width / WIDTH - VERTEX_SIZE * 0.8, edge_y + (g->vertexs[i].y) * height / HEIGHT - VERTEX_SIZE * 0.8, tmp, f, 0, 0, 0);
     }
 
     // display aretes
@@ -130,10 +130,10 @@ void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp, SDL_Color *
     for (int i = 0; i < g->nb_arete; i++)
     {
 
-        sx =edge_x + (g->vertexs[g->aretes[i].start].x)*width/WIDTH;
-        sy = edge_y + (g->vertexs[g->aretes[i].start].y)*height/HEIGHT;
-        ex =edge_x + (g->vertexs[g->aretes[i].end].x)*width/WIDTH;
-        ey = edge_y + (g->vertexs[g->aretes[i].end].y)*height/HEIGHT;
+        sx = edge_x + (g->vertexs[g->aretes[i].start].x) * width / WIDTH;
+        sy = edge_y + (g->vertexs[g->aretes[i].start].y) * height / HEIGHT;
+        ex = edge_x + (g->vertexs[g->aretes[i].end].x) * width / WIDTH;
+        ey = edge_y + (g->vertexs[g->aretes[i].end].y) * height / HEIGHT;
         color(r, 0, 0, 0, 0);
 
         double theta = atan2(ey - sy, ex - sx);
@@ -163,9 +163,9 @@ void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp, SDL_Color *
                      sx + VERTEX_SIZE * 0.5, sy + VERTEX_SIZE * 1.3, 1); // left
         }
     }
-    //display red border :
+    // display red border :
     color(r, 255, 0, 0, 1);
-    rect(r, edge_x, edge_y, width, height, 0); 
+    rect(r, edge_x, edge_y, width, height, 0);
 }
 
 void circlePoints(Graph *g)
@@ -256,10 +256,11 @@ void weightAsDistance(Graph *g)
     }
 }
 
-void creatCoordinatesSystem(const char*file_name, Graph *g)
-{   
-    FILE*f = fopen(file_name, "r");
-    if(f == NULL){
+void creatCoordinatesSystem(const char *file_name, Graph *g)
+{
+    FILE *f = fopen(file_name, "r");
+    if (f == NULL)
+    {
         fprintf(stderr, "failed to open text file\n");
         fclose(f);
 
@@ -308,7 +309,7 @@ void creatCoordinatesSystem(const char*file_name, Graph *g)
             {
                 sscanf(buffer, "%lf%3s%lf", &x, bin, &y);
                 g->vertexs[i].y = (HEIGHT) - (x - xmin) * HEIGHT / (xmax - xmin);
-                g->vertexs[i].x =  (y - ymin) * WIDTH / (ymax - ymin);
+                g->vertexs[i].x = (y - ymin) * WIDTH / (ymax - ymin);
                 g->vertexs[i].id = i;
                 g->vertexs[i].color = NO_COLOR;
                 g->nb_vertex = i + 1;
@@ -329,7 +330,7 @@ void creatCoordinatesSystem(const char*file_name, Graph *g)
         else if (links_reading)
         {
             sscanf(buffer, "%c", &bin[0]);
-            if (bin[0] != '.') 
+            if (bin[0] != '.')
             {
                 sscanf(buffer, "%d%c%d", &a, &bin[0], &b);
                 g->aretes[i].start = a - 3;
@@ -344,8 +345,10 @@ void creatCoordinatesSystem(const char*file_name, Graph *g)
                     fclose(f);
                     return;
                 }
-            }else{//bin[0] == 'd' ; create a double arete
-                sscanf(buffer, "%c%d%c%d",&bin[0], &a, &bin[0], &b);
+            }
+            else
+            { // bin[0] == 'd' ; create a double arete
+                sscanf(buffer, "%c%d%c%d", &bin[0], &a, &bin[0], &b);
                 g->aretes[i].start = a - 3;
                 g->aretes[i].end = b - 3; //-3 to count after max and min
                 g->aretes[i].id = i;
@@ -375,4 +378,73 @@ void creatCoordinatesSystem(const char*file_name, Graph *g)
     }
     fclose(f);
     // printf("%f\n", ymax-ymin);
+}
+//remove sdl renderer when function is working
+int linkByClick(const char *file_name, Graph *g, double x1, double y1, double x2, double y2, int doublelink, int edge_x, int edge_y, int width, int height)
+{   
+    if(x1 < 0 || x2 < 0 || y1 <0 || y2 < 0)
+        return 0;
+    int s = -1, e = -1;
+    color(r, 255, 0, 0, 1);
+    circle(r, x1, y1, VERTEX_SIZE, 1);
+    circle(r, x2, y2, VERTEX_SIZE, 1);
+    for (int i = 0; i < g->nb_vertex && s == -1; i++)
+    {
+        mark(r, edge_x + (g->vertexs[i].x) * width / WIDTH, edge_y + (g->vertexs[i].y) * height / HEIGHT, 5);
+        if (dist(x1, y1, edge_x + (g->vertexs[i].x) * width / WIDTH, edge_y + (g->vertexs[i].y) * height / HEIGHT) < VERTEX_SIZE)
+            s = i;
+    }
+
+    for (int i = 0; i < g->nb_vertex && s != -1 && e == -1; i++)
+    {
+        if (dist(x2, y2, edge_x + (g->vertexs[i].x) * width / WIDTH, edge_y + (g->vertexs[i].y) * height / HEIGHT) < VERTEX_SIZE)
+            e = i;
+    }
+
+    if(s == -1 || e == -1) // no clicks in thee vertexs
+        return 0 ;
+
+    FILE *f = fopen(file_name, "a");
+    if (f == NULL)
+    {
+        fprintf(stderr, "failed to open text file\n");
+        fclose(f);
+
+        return 0;
+    }
+    if(g->nb_arete == 0)
+        fprintf(f, "%s", "LINKS");//write the word LINKS if it donesn't exists to avoid bugs when reading
+    
+
+
+    printf("adding arete between %d and %d \n", s, e);
+    addArete(g, g->nb_arete, s, e, NO_WEIGHT);
+    /*if (g->nb_arete >= g->a)
+    {
+        fprintf(stderr, "arrete array isn't big enough\n");
+        return;
+    }
+    g->aretes[g->nb_arete].start = s;
+    g->aretes[g->nb_arete].end = e;
+    g->aretes[g->nb_arete].id = g->nb_arete;
+    g->nb_arete += 1;*/
+    if (doublelink)
+    {
+        fprintf(f, "%d %d\n", e, s);
+        addArete(g, g->nb_arete, e, s, NO_WEIGHT);
+
+        /*if (g->nb_arete >= g->a)
+        {
+            fprintf(stderr, "arrete array isn't big enough\n");
+            return;
+        }
+        g->aretes[g->nb_arete].start = e;
+        g->aretes[g->nb_arete].end = s;
+        g->aretes[g->nb_arete].id = g->nb_arete;
+        g->nb_arete += 1;*/
+        fprintf(f, "%s", ".");//double way arrow signature
+    }
+    fprintf(f, "%d %d\n", s, e);
+    fclose(f);
+    return 1;//sucess
 }

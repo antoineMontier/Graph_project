@@ -1,7 +1,7 @@
 #define NO_COLOR -1
 #define NO_WEIGHT -1
 #define NB_COLOR 15
-#define VERTEX_SIZE 10
+#define VERTEX_SIZE 20
 
 #include "SDL_Basics.h"
 
@@ -44,3 +44,4 @@ void circlePoints(Graph*g);
 SDL_Color* initialiseColors();
 void weightAsDistance(Graph*g);
 void creatCoordinatesSystem(const char*file_name, Graph *g);
+int linkByClick(const char *file_name, Graph *g, double x1, double y1, double x2, double y2, int doublelink, int edge_x, int edge_y, int width, int height);
