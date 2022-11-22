@@ -7,6 +7,7 @@
 #define IN 1
 #define OUT -1
 #define NO_ZOOM 0
+#define ZOOM_POWER 0.05
 
 int main()
 { /*gcc -c -Wall -Wextra main.c && gcc main.o -lm -o main && ./main*/
@@ -27,52 +28,29 @@ int main()
     char *tmp = malloc(10);
     Graph g;
     createGraph(&g, 200, 1000);
-    /*addArete(&g, id++, 0, 1, NO_WEIGHT);
-    addArete(&g, id++, 0, 7, NO_WEIGHT);
-    addArete(&g, id++, 2, 14, NO_WEIGHT);
-    addArete(&g, id++, 1, 9, NO_WEIGHT);
-    addArete(&g, id++, 4, 5, NO_WEIGHT);
-    addArete(&g, id++, 5, 6, NO_WEIGHT);
-    addArete(&g, id++, 7, 2, NO_WEIGHT);
-    addArete(&g, id++, 14, 4, NO_WEIGHT);
-    addArete(&g, id++, 4, 13, NO_WEIGHT);
-    addArete(&g, id++, 13, 12, NO_WEIGHT);
-    addArete(&g, id++, 12, 6, NO_WEIGHT);
-    addArete(&g, id++, 6, 11, NO_WEIGHT);
-    addArete(&g, id++, 7, 8, NO_WEIGHT);
-    addArete(&g, id++, 9, 3, NO_WEIGHT);
-    addArete(&g, id++, 9, 8, NO_WEIGHT);
-    addArete(&g, id++, 3, 10, NO_WEIGHT);
-    addArete(&g, id++, 14, 15, NO_WEIGHT);
-    addArete(&g, id++, 15, 16, NO_WEIGHT);
-    addArete(&g, id++, 16, 6, NO_WEIGHT);
-    addArete(&g, id++, 16, 5, NO_WEIGHT);
-    addArete(&g, id++, 8, 19, NO_WEIGHT);
-    addArete(&g, id++, 19, 18, NO_WEIGHT);
-    addArete(&g, id++, 19, 20, NO_WEIGHT);
-    addArete(&g, id++, 20, 21, NO_WEIGHT);
-    addArete(&g, id++, 21, 16, NO_WEIGHT);
-    addArete(&g, id++, 10, 17, NO_WEIGHT);
-    addArete(&g, id++, 10, 11, NO_WEIGHT);
-    addArete(&g, id++, 2, 8, NO_WEIGHT);
-    addArete(&g, id++, 8, 3, NO_WEIGHT);
-    addArete(&g, id++, 0, 1, NO_WEIGHT);*/
 
-    int _w = WIDTH, _h = HEIGHT, m_x = WIDTH/2, m_y = HEIGHT/2, click = 0, p_mx=0, p_my=0, c_x = 0, c_y = 0;
+    int _w = WIDTH, _h = HEIGHT, m_x = WIDTH/2, m_y = HEIGHT/2, click = 0, p_mx=0, p_my=0;
+    double c_x = 0, c_y = 0;
+    double theta, alpha;
     while (program_launched)
     {            
-        //printf("%d    %d  \n", _w, _h);
-        printf("%d ; %d \n", m_x, m_y);
+
         if (zoom == IN)
         {
-            _w *= 1.05;
-            _h *= 1.05;
+            printf("zoom in\n");
+            c_x -= _w*ZOOM_POWER/2;
+            c_y -= _h*ZOOM_POWER/2;
+            _w *= 1 + ZOOM_POWER;
+            _h *= 1 + ZOOM_POWER;
             zoom = NO_ZOOM;
         }
         else if (zoom == OUT)
         {
-            _w *= 0.95;
-            _h *= 0.95;
+            printf("zoom out\n");
+            c_x += _w*ZOOM_POWER/2;
+            c_y += _h*ZOOM_POWER/2;
+            _w *= 1  - ZOOM_POWER;
+            _h *= 1  - ZOOM_POWER;
             zoom = NO_ZOOM;
         }
         //printf("(%d ; %d )\n", m_x, m_y);
@@ -81,14 +59,22 @@ int main()
         if (click)
         {
             displayGraph(r, f, &g, tmp, palette, c_x, c_y, _w, _h);
-            c_x += (- p_mx + m_x)*(WIDTH/(float)_w*7);
-            c_y += (- p_my + m_y)*(HEIGHT/(float)_h*6);
+            c_x += (- p_mx + m_x)*(WIDTH/(float)_w*10);
+            c_y += (- p_my + m_y)*(HEIGHT/(float)_h*10);
             p_my = m_y;
             p_mx = m_x;
-        }
+        }     
 
         else displayGraph(r, f, &g, tmp, palette, c_x, c_y, _w, _h);
-            SDL_RenderPresent(r); // refresh the render
+
+        color(r, 0, 100, 100, 1);
+        mark(r, m_x, m_y, 2);
+        color(r, 255, 0, 0, 1);
+        mark(r, c_x, c_y, 8);
+        mark(r, c_x, c_y + _h, 8);
+        mark(r, c_x + _w, c_y, 8);
+        mark(r, c_x + _w, c_y + _h, 8);
+        SDL_RenderPresent(r); // refresh the render
 
             while (SDL_PollEvent(&evt))
             { // reads all the events (mouse moving, key pressed...)        //possible to wait for an event with SDL_WaitEvent

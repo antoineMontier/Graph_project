@@ -116,13 +116,13 @@ void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp, SDL_Color *
         if (g->vertexs[i].color != NO_COLOR)
         {
             color(r, c[g->vertexs[i].color].r, c[g->vertexs[i].color].g, c[g->vertexs[i].color].b, c[g->vertexs[i].color].a);
-            circle(r, (g->vertexs[i].x + edge_x)*width/WIDTH, (g->vertexs[i].y + edge_y)*height/HEIGHT, VERTEX_SIZE, 1);
+            circle(r, edge_x + (g->vertexs[i].x)*width/WIDTH, edge_y + (g->vertexs[i].y)*height/HEIGHT, VERTEX_SIZE, 1);
         }
         color(r, 0, 0, 0, 1); // black border
-        circle(r, (g->vertexs[i].x + edge_x)*width/WIDTH, (g->vertexs[i].y + edge_y)*height/HEIGHT, VERTEX_SIZE, 0);
+        circle(r, edge_x + (g->vertexs[i].x)*width/WIDTH, edge_y + (g->vertexs[i].y)*height/HEIGHT, VERTEX_SIZE, 0);
         toChar(tmp, g->vertexs[i].id + 3);
         // printf("%d\n", g->vertexs[i].id);
-        text(r, (g->vertexs[i].x + edge_x)*width/WIDTH - VERTEX_SIZE * 0.8, (g->vertexs[i].y + edge_y)*height/HEIGHT - VERTEX_SIZE * 0.8, tmp, f, 0, 0, 0);
+        text(r, edge_x + (g->vertexs[i].x)*width/WIDTH - VERTEX_SIZE * 0.8, edge_y + (g->vertexs[i].y)*height/HEIGHT - VERTEX_SIZE * 0.8, tmp, f, 0, 0, 0);
     }
 
     // display aretes
@@ -130,10 +130,10 @@ void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp, SDL_Color *
     for (int i = 0; i < g->nb_arete; i++)
     {
 
-        sx = (g->vertexs[g->aretes[i].start].x + edge_x)*width/WIDTH;
-        sy = (g->vertexs[g->aretes[i].start].y + edge_y)*height/HEIGHT;
-        ex = (g->vertexs[g->aretes[i].end].x + edge_x)*width/WIDTH;
-        ey = (g->vertexs[g->aretes[i].end].y + edge_y)*height/HEIGHT;
+        sx =edge_x + (g->vertexs[g->aretes[i].start].x)*width/WIDTH;
+        sy = edge_y + (g->vertexs[g->aretes[i].start].y)*height/HEIGHT;
+        ex =edge_x + (g->vertexs[g->aretes[i].end].x)*width/WIDTH;
+        ey = edge_y + (g->vertexs[g->aretes[i].end].y)*height/HEIGHT;
         color(r, 0, 0, 0, 0);
 
         double theta = atan2(ey - sy, ex - sx);
