@@ -379,27 +379,22 @@ void creatCoordinatesSystem(const char *file_name, Graph *g)
     fclose(f);
     // printf("%f\n", ymax-ymin);
 }
-//remove sdl renderer when function is working
+
 int linkByClick(const char *file_name, Graph *g, double x1, double y1, double x2, double y2, int doublelink, int edge_x, int edge_y, int width, int height)
 {   
     if(x1 < 0 || x2 < 0 || y1 <0 || y2 < 0)
         return 0;
     int s = -1, e = -1;
-    color(r, 255, 0, 0, 1);
-    circle(r, x1, y1, VERTEX_SIZE, 1);
-    circle(r, x2, y2, VERTEX_SIZE, 1);
+
     for (int i = 0; i < g->nb_vertex && s == -1; i++)
-    {
-        mark(r, edge_x + (g->vertexs[i].x) * width / WIDTH, edge_y + (g->vertexs[i].y) * height / HEIGHT, 5);
         if (dist(x1, y1, edge_x + (g->vertexs[i].x) * width / WIDTH, edge_y + (g->vertexs[i].y) * height / HEIGHT) < VERTEX_SIZE)
             s = i;
-    }
+    
 
     for (int i = 0; i < g->nb_vertex && s != -1 && e == -1; i++)
-    {
         if (dist(x2, y2, edge_x + (g->vertexs[i].x) * width / WIDTH, edge_y + (g->vertexs[i].y) * height / HEIGHT) < VERTEX_SIZE)
             e = i;
-    }
+    
 
     if(s == -1 || e == -1) // no clicks in thee vertexs
         return 0 ;
