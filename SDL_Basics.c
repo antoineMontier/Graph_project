@@ -344,7 +344,7 @@ void toChar(char*c, int n){
         c[1] = '0' + (char)(n/10 % 10);
         c[0] = '0' + (char)(n/100);
         c[3] = '\0';
-    }
+    } 
 
 }
 

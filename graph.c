@@ -163,6 +163,9 @@ void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp, SDL_Color *
                      sx + VERTEX_SIZE * 0.5, sy + VERTEX_SIZE * 1.3, 1); // left
         }
     }
+    //display red border :
+    color(r, 255, 0, 0, 1);
+    rect(r, edge_x, edge_y, width, height, 0); 
 }
 
 void circlePoints(Graph *g)
@@ -304,7 +307,6 @@ void creatCoordinatesSystem(const char*file_name, Graph *g)
             if (strcmp(bin, "LINKS") != 0)
             {
                 sscanf(buffer, "%lf%3s%lf", &x, bin, &y);
-                // printf("(%f ; %f)\n", (x-xmin)*width/(xmax-xmin), (y-ymin)*height/(ymax-ymin));
                 g->vertexs[i].y = (HEIGHT) - (x - xmin) * HEIGHT / (xmax - xmin);
                 g->vertexs[i].x =  (y - ymin) * WIDTH / (ymax - ymin);
                 g->vertexs[i].id = i;

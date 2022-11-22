@@ -37,7 +37,6 @@ int main()
 
         if (zoom == IN)
         {
-            printf("zoom in\n");
             c_x -= _w*ZOOM_POWER/2;
             c_y -= _h*ZOOM_POWER/2;
             _w *= 1 + ZOOM_POWER;
@@ -46,14 +45,13 @@ int main()
         }
         else if (zoom == OUT)
         {
-            printf("zoom out\n");
-            c_x += _w*ZOOM_POWER/2;
-            c_y += _h*ZOOM_POWER/2;
+            c_x += _w*ZOOM_POWER/(m_x/WIDTH);
+            c_y += _h*ZOOM_POWER/(m_y/HEIGHT);
             _w *= 1  - ZOOM_POWER;
             _h *= 1  - ZOOM_POWER;
             zoom = NO_ZOOM;
         }
-        //printf("(%d ; %d )\n", m_x, m_y);
+
         creatCoordinatesSystem("./coordinates.txt", &g);
         background(r, 255, 255, 255, WIDTH, HEIGHT);
         if (click)
@@ -67,13 +65,6 @@ int main()
 
         else displayGraph(r, f, &g, tmp, palette, c_x, c_y, _w, _h);
 
-        color(r, 0, 100, 100, 1);
-        mark(r, m_x, m_y, 2);
-        color(r, 255, 0, 0, 1);
-        mark(r, c_x, c_y, 8);
-        mark(r, c_x, c_y + _h, 8);
-        mark(r, c_x + _w, c_y, 8);
-        mark(r, c_x + _w, c_y + _h, 8);
         SDL_RenderPresent(r); // refresh the render
 
             while (SDL_PollEvent(&evt))

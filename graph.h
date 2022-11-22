@@ -39,7 +39,7 @@ void printGraph(Graph *g);
 void printVertex(Vertex *v);
 void printArete(Arete *a);
 void createCompleteGraph(Graph *g, int n);
-void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp, SDL_Color *c, int edge_x, int edge_y, int width, int height); 
+void displayGraph(SDL_Renderer *r, TTF_Font *f, Graph *g, char *tmp, SDL_Color *c, int edge_x, int edge_y, int width, int height);  
 void circlePoints(Graph*g);
 SDL_Color* initialiseColors();
 void weightAsDistance(Graph*g);

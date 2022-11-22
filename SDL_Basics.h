@@ -3,7 +3,7 @@
 #include <time.h>
 #include <math.h>
 
-#define WIDTH 1000
+#define WIDTH 1000 
 #define HEIGHT 1000
 
 void SDL_ExitWithError(const char *string);
