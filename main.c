@@ -23,20 +23,20 @@ int main()
     SDL_bool program_launched = SDL_TRUE;
     openSDL(WIDTH, HEIGHT, 0, &w, &r);
     TTF_Font *f;
-    setFont(&f, "Roboto-Black.ttf", VERTEX_SIZE * 1.5);
+    setFont(&f, "Roboto-Black.ttf", VERTEX_SIZE * 0.8);
 
     char *tmp = malloc(10);
     Graph g;
-    createGraph(&g, 200, 1000);
+    createGraph(&g, 500, 2000);
 
     int _w = WIDTH, _h = HEIGHT, m_x = WIDTH / 2, m_y = HEIGHT / 2, click = 0, p_mx = 0, p_my = 0, caps = 0, click_x = -1, click_y = -1, link_mode = 0;
     double c_x = 0, c_y = 0;
-    double theta, alpha;
-    creatCoordinatesSystem("./coordinates.txt", &g);
+    creatCoordinatesSystem("./coordinates.txt", "./links.txt", &g);
 
     while (program_launched)
     {
         //printf("%d\n", g.nb_arete);
+
 
         if (zoom == IN)
         {
@@ -56,6 +56,8 @@ int main()
         }
 
         background(r, 255, 255, 255, WIDTH, HEIGHT);
+        color(r, 255, 0, 0, 1);
+        mark(r, c_x, c_y, 2);
         if (click)
         {
             displayGraph(r, f, &g, tmp, palette, c_x, c_y, _w, _h);
@@ -89,6 +91,10 @@ int main()
                     link_mode = !link_mode; // escape the program by pressing esc
                     break;
 
+                case SDLK_v:
+                    createVertex("./coordinates.txt", &g, c_x, c_y, _w, _h, m_x, m_y);
+                    break;
+
                 case SDLK_CAPSLOCK:
                     caps = !caps;
                     break;
@@ -114,7 +120,7 @@ int main()
                 if (link_mode)
                 {
                     //printf("(%d ; %d)       (%d ; %d)\n", evt.button.x, evt.button.y, click_x, click_y);
-                    if (linkByClick("./coordinates.txt", &g, click_x, click_y, evt.button.x, evt.button.y, caps, c_x, c_y, _w, _h))
+                    if (linkByClick("./links.txt", &g, click_x, click_y, evt.button.x, evt.button.y, caps, c_x, c_y, _w, _h))
                     {
                         click_x = -1;//avoid repeat
                         click_y = -1;
@@ -144,7 +150,7 @@ int main()
             }
         }
         SDL_RenderPresent(r); // refresh the render
-        SDL_Delay(200);
+        SDL_Delay(33);
     }
     free(palette);
     free(tmp);

@@ -256,14 +256,13 @@ void weightAsDistance(Graph *g)
     }
 }
 
-void creatCoordinatesSystem(const char *file_name, Graph *g)
+void creatCoordinatesSystem(const char *file_coord, const char *file_links, Graph *g)
 {
-    FILE *f = fopen(file_name, "r");
-    if (f == NULL)
+    FILE *fc = fopen(file_coord, "r");
+    if (fc == NULL)
     {
         fprintf(stderr, "failed to open text file\n");
-        fclose(f);
-
+        fclose(fc);
         return;
     }
 
@@ -274,13 +273,13 @@ void creatCoordinatesSystem(const char *file_name, Graph *g)
     double x, y;
     int a, b;
 
-    fgets(buffer, sizeof(buffer), f);
+    fgets(buffer, sizeof(buffer), fc);
     sscanf(buffer, "%3s", bin);
     if (strcmp(bin, "MIN") != 0)
         fprintf(stderr, "no min value in the coordinate file\n");
     sscanf(buffer, "%4s%lf%3s%lf", bin, &xmin, bin, &ymin);
 
-    fgets(buffer, sizeof(buffer), f);
+    fgets(buffer, sizeof(buffer), fc);
     sscanf(buffer, "%3s", bin);
     if (strcmp(bin, "MAX") != 0)
         fprintf(stderr, "no max value in the coordinate file\n");
@@ -298,108 +297,119 @@ void creatCoordinatesSystem(const char *file_name, Graph *g)
 
     // here, xmin ymin xmax ymax are initialized !
     int i = 0;
-    while (!feof(f))
+    while (!feof(fc))
     { // read while end of file isn't reached
-        fgets(buffer, sizeof(buffer), f);
+        fgets(buffer, sizeof(buffer), fc);
 
         if (!links_reading)
         {
             sscanf(buffer, "%6s", bin);
-            if (strcmp(bin, "LINKS") != 0)
+            sscanf(buffer, "%lf%3s%lf", &x, bin, &y);
+            if (HEIGHT <= WIDTH)
             {
-                sscanf(buffer, "%lf%3s%lf", &x, bin, &y);
                 g->vertexs[i].y = (HEIGHT) - (x - xmin) * HEIGHT / (xmax - xmin);
+                g->vertexs[i].x = (y - ymin) * HEIGHT / (xmax - xmin);
+            }
+            else
+            {
+                g->vertexs[i].y = (WIDTH) - (x - xmin) * WIDTH / (ymax - ymin);
                 g->vertexs[i].x = (y - ymin) * WIDTH / (ymax - ymin);
-                g->vertexs[i].id = i;
-                g->vertexs[i].color = NO_COLOR;
-                g->nb_vertex = i + 1;
-                i++;
-                if (i >= g->v)
-                {
-                    fprintf(stderr, "graph vertex array is too small\n");
-                    fclose(f);
-                    return;
-                }
             }
-            else
+            g->vertexs[i].id = i;
+            g->vertexs[i].color = NO_COLOR;
+            g->nb_vertex = i + 1;
+            i++;
+            if (i >= g->v)
             {
-                links_reading = 1;
-                i = 0;
-            }
-        }
-        else if (links_reading)
-        {
-            sscanf(buffer, "%c", &bin[0]);
-            if (bin[0] != '.')
-            {
-                sscanf(buffer, "%d%c%d", &a, &bin[0], &b);
-                g->aretes[i].start = a - 3;
-                g->aretes[i].end = b - 3; //-3 to count after max and min
-                g->aretes[i].id = i;
-                g->aretes[i].weight = NO_WEIGHT;
-                g->nb_arete = i + 1;
-                i++;
-                if (i >= g->a)
-                {
-                    fprintf(stderr, "graph arete array is too small\n");
-                    fclose(f);
-                    return;
-                }
-            }
-            else
-            { // bin[0] == 'd' ; create a double arete
-                sscanf(buffer, "%c%d%c%d", &bin[0], &a, &bin[0], &b);
-                g->aretes[i].start = a - 3;
-                g->aretes[i].end = b - 3; //-3 to count after max and min
-                g->aretes[i].id = i;
-                g->aretes[i].weight = NO_WEIGHT;
-                g->nb_arete = i + 1;
-                i++;
-                if (i >= g->a)
-                {
-                    fprintf(stderr, "graph arete array is too small\n");
-                    fclose(f);
-                    return;
-                }
-                g->aretes[i].start = b - 3;
-                g->aretes[i].end = a - 3; //-3 to count after max and min
-                g->aretes[i].id = i;
-                g->aretes[i].weight = NO_WEIGHT;
-                g->nb_arete = i + 1;
-                i++;
-                if (i >= g->a)
-                {
-                    fprintf(stderr, "graph arete array is too small\n");
-                    fclose(f);
-                    return;
-                }
+                fprintf(stderr, "graph vertex array is too small\n");
+                fclose(fc);
+                return;
             }
         }
     }
-    fclose(f);
+    fclose(fc);
+
+    // read links....
+
+    FILE *fl = fopen(file_links, "r");
+    if (fl == NULL)
+    {
+        fprintf(stderr, "failed to open text file\n");
+        fclose(fl);
+        return;
+    }
+    while (!feof(fl))
+    {
+        fgets(buffer, sizeof(buffer), fl);
+
+        sscanf(buffer, "%c", &bin[0]);
+        if (bin[0] != '.')
+        {
+            sscanf(buffer, "%d%c%d", &a, &bin[0], &b);
+            g->aretes[i].start = a - 3;
+            g->aretes[i].end = b - 3; //-3 to count after max and min
+            g->aretes[i].id = i;
+            g->aretes[i].weight = NO_WEIGHT;
+            g->nb_arete = i + 1;
+            i++;
+            if (i >= g->a)
+            {
+                fprintf(stderr, "graph arete array is too small\n");
+                fclose(fl);
+                return;
+            }
+        }
+        else
+        { // bin[0] == 'd' ; create a double arete
+            sscanf(buffer, "%c%d%c%d", &bin[0], &a, &bin[0], &b);
+            g->aretes[i].start = a - 3;
+            g->aretes[i].end = b - 3; //-3 to count after max and min
+            g->aretes[i].id = i;
+            g->aretes[i].weight = NO_WEIGHT;
+            g->nb_arete = i + 1;
+            i++;
+            if (i >= g->a)
+            {
+                fprintf(stderr, "graph arete array is too small\n");
+                fclose(fl);
+                return;
+            }
+            g->aretes[i].start = b - 3;
+            g->aretes[i].end = a - 3; //-3 to count after max and min
+            g->aretes[i].id = i;
+            g->aretes[i].weight = NO_WEIGHT;
+            g->nb_arete = i + 1;
+            i++;
+            if (i >= g->a)
+            {
+                fprintf(stderr, "graph arete array is too small\n");
+                fclose(fl);
+                return;
+            }
+        }
+    }
+    fclose(fl);
     // printf("%f\n", ymax-ymin);
 }
 
-int linkByClick(const char *file_name, Graph *g, double x1, double y1, double x2, double y2, int doublelink, int edge_x, int edge_y, int width, int height)
-{   
-    if(x1 < 0 || x2 < 0 || y1 <0 || y2 < 0)
+int linkByClick(const char *file_links, Graph *g, double x1, double y1, double x2, double y2, int doublelink, int edge_x, int edge_y, int width, int height)
+{
+    if (x1 < 0 || x2 < 0 || y1 < 0 || y2 < 0)
         return 0;
     int s = -1, e = -1;
 
     for (int i = 0; i < g->nb_vertex && s == -1; i++)
         if (dist(x1, y1, edge_x + (g->vertexs[i].x) * width / WIDTH, edge_y + (g->vertexs[i].y) * height / HEIGHT) < VERTEX_SIZE)
             s = i;
-    
 
     for (int i = 0; i < g->nb_vertex && s != -1 && e == -1; i++)
         if (dist(x2, y2, edge_x + (g->vertexs[i].x) * width / WIDTH, edge_y + (g->vertexs[i].y) * height / HEIGHT) < VERTEX_SIZE)
             e = i;
-    
 
-    if(s == -1 || e == -1) // no clicks in thee vertexs
-        return 0 ;
+    if (s == -1 || e == -1) // no clicks in thee vertexs
+        return 0;
 
-    FILE *f = fopen(file_name, "a");
+    FILE *f = fopen(file_links, "a");
     if (f == NULL)
     {
         fprintf(stderr, "failed to open text file\n");
@@ -407,10 +417,6 @@ int linkByClick(const char *file_name, Graph *g, double x1, double y1, double x2
 
         return 0;
     }
-    if(g->nb_arete == 0)
-        fprintf(f, "%s", "LINKS");//write the word LINKS if it donesn't exists to avoid bugs when reading
-    
-
 
     printf("adding arete between %d and %d \n", s, e);
     addArete(g, g->nb_arete, s, e, NO_WEIGHT);
@@ -425,7 +431,6 @@ int linkByClick(const char *file_name, Graph *g, double x1, double y1, double x2
     g->nb_arete += 1;*/
     if (doublelink)
     {
-        fprintf(f, "%d %d\n", e, s);
         addArete(g, g->nb_arete, e, s, NO_WEIGHT);
 
         /*if (g->nb_arete >= g->a)
@@ -437,9 +442,81 @@ int linkByClick(const char *file_name, Graph *g, double x1, double y1, double x2
         g->aretes[g->nb_arete].end = s;
         g->aretes[g->nb_arete].id = g->nb_arete;
         g->nb_arete += 1;*/
-        fprintf(f, "%s", ".");//double way arrow signature
+        fprintf(f, "%s", "."); // double way arrow signature
     }
-    fprintf(f, "%d %d\n", s, e);
+    fprintf(f, "%d %d\n", s + 3, e + 3);
     fclose(f);
-    return 1;//sucess
+    return 1; // sucess
+}
+
+int createVertex(const char* file_coordinates, Graph*g, double cx, double cy, double _w, double _h, double x, double y){
+    //first let's know the min and max value :
+    FILE *fc = fopen(file_coordinates, "r");
+    if (fc == NULL)
+    {
+        fprintf(stderr, "failed to open text file\n");
+        fclose(fc);
+        return 0;
+    }
+
+    // first know the min/max value
+    double xmin, xmax, ymin, ymax;
+    char buffer[128];
+    char bin[16];
+    double _x, _y;
+    int a, b;
+
+    fgets(buffer, sizeof(buffer), fc);
+    sscanf(buffer, "%3s", bin);
+    if (strcmp(bin, "MIN") != 0)
+        fprintf(stderr, "no min value in the coordinate file\n");
+    sscanf(buffer, "%4s%lf%3s%lf", bin, &xmin, bin, &ymin);
+
+    fgets(buffer, sizeof(buffer), fc);
+    sscanf(buffer, "%3s", bin);
+    if (strcmp(bin, "MAX") != 0)
+        fprintf(stderr, "no max value in the coordinate file\n");
+    sscanf(buffer, "%4s%lf%3s%lf", bin, &xmax, bin, &ymax);
+
+    _x = fmin(xmin, xmax);
+    _y = fmax(xmin, xmax);
+    xmin = _x;
+    xmax = _y;
+    _x = fmin(ymin, ymax);
+    _y = fmax(ymin, ymax);
+    ymin = _x;
+    ymax = _y;
+    printf("(%f, %f)\t(%f %f)\n",xmin, ymin, xmax, ymax);
+    fclose(fc);
+
+
+    //add vertex on the actual graph :
+
+    //transform x and y into coordinates
+    double coordx, coordy, aa, bb;
+
+    aa= (x - cx)/(double)_w;
+    bb = (y - cy)/(double)_h;
+    addVertex(g, g->nb_vertex - 1, aa*WIDTH, bb*HEIGHT, NO_COLOR);
+
+    coordx = xmin + aa*(xmax - xmin) * (_h/WIDTH);
+    coordy = ymin + bb*(ymax - ymin) * (_w/HEIGHT);
+
+    //write the coordinates in the file :
+    FILE*fr = fopen(file_coordinates, "a");
+    fprintf(fr, "%lf , %lf\n", coordx, coordy);
+    /*if (HEIGHT <= WIDTH)
+            {
+                coordy = (HEIGHT) - (x - xmin) * HEIGHT / (xmax - xmin);
+                coordx = (y - ymin) * HEIGHT / (xmax - xmin);
+            }
+        else
+            {
+                coordy = (WIDTH) - (x - xmin) * WIDTH / (ymax - ymin);
+                coordx = (y - ymin) * WIDTH / (ymax - ymin);
+            }*/
+
+
+    fclose(fr);
+    return 1;
 }
