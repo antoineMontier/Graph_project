@@ -46,3 +46,5 @@ void weightAsDistance(Graph*g);
 void creatCoordinatesSystem(const char *file_coord, const char *file_links, Graph *g);
 int linkByClick(const char *file_name, Graph *g, double x1, double y1, double x2, double y2, int doublelink, int edge_x, int edge_y, int width, int height);
 int createVertex(const char* file_coordinates, Graph*g, double cx, double cy, double _w, double _h, double x, double y);
+Graph* minimal_weight_tree(Graph* g);
+int isPresentInArray(int value, int*array, int size);

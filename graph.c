@@ -520,3 +520,34 @@ int createVertex(const char* file_coordinates, Graph*g, double cx, double cy, do
     fclose(fr);
     return 1;
 }
+
+Graph* minimal_weight_tree(Graph * g){//using prim algorithm
+    Graph tree;
+    createGraph(&g, g->nb_vertex, (g->nb_vertex*2 + 1) + 5);
+    addVertex(&tree, g->vertexs[0].id, g->vertexs[0].x, g->vertexs[0].y, g->vertexs[0].color);//choose a random vertex
+    int arrete_id = 0;
+    while(tree.nb_vertex < g->nb_vertex){
+        //choose a link : 
+        for(int i = 0; i < g->nb_arete; i++){
+            //todo : find the minimal weight
+            if(isPresentInArray(g->aretes[i].start, tree.aretes, tree.nb_arete) && !isPresentInArray(g->aretes[i].end, tree.aretes, tree.nb_arete)){//arret start must be in tree but not end
+                addVertex(&tree, g->aretes[i].end, g->aretes[i].x, g->aretes[i].y, g->aretes[i].color);
+                addArete(&tree, arrete_id++, g->aretes[i].start, g->aretes[i].end, g->aretes[i].weight);
+            }else if(i == g->nb_arete){
+                destructGraph(&tree);
+                fprintf(stderr, "graph isn't connexed\n");
+            }
+        }
+    }
+
+
+
+    return &tree;
+}
+
+int isPresentInArray(int value, int*array, int size){
+    for(int i = 0; i < size ; i++)
+        if(array[i] == value)
+            return true;
+    return false;
+}
