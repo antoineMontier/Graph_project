@@ -25,7 +25,7 @@ void addVertex(Graph *g, int id, int x, int y, int color)
 {
     if (g->v <= g->nb_vertex)
     {
-        printf("you reached the max amount of vertex\n");
+        fprintf(stderr, "you reached the max amount of vertex\n");
         return;
     }
     Vertex v;
@@ -295,7 +295,7 @@ void creatCoordinatesSystem(const char *file_coord, const char *file_links, Grap
     ymax = y;
     int links_reading = 0;
 
-    // here, xmin ymin xmax ymax are initialized !
+    // here, xmin ymin xmax ymax are known
     int i = 0;
     while (!feof(fc))
     { // read while end of file isn't reached
@@ -532,7 +532,7 @@ void minimal_weight_tree(Graph * g, Graph*tree){//using prim algorithm
                 addArete(tree, arrete_id++, g->aretes[i].start, g->aretes[i].end, g->aretes[i].weight);
                 i = g->nb_arete + 1;//stop the loop
             }else if(i == g->nb_arete)
-                fprintf(stderr, "graph isn't connexed\n");
+                fprintf(stderr, "graph isn't connex\n");
         }
     }
 }
